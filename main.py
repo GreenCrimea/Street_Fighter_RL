@@ -4,6 +4,11 @@ import numpy as np
 from gym.spaces import MultiBinary, Box 
 from gym import Env 
 import cv2
+import optuna
+from stable_baselines3 import PPO 
+from stable_baselines3.common.evaluation import evaluate_policy
+from stable_baselines3.common.monitor import Monitor
+from stable_baselines3.common.vec_env import DummyVecEnv, VecFrameStack
 
 
 #python -m retro.import .   <<<   IMPORT ROMS
