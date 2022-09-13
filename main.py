@@ -84,7 +84,7 @@ class StreetFighter(Env):
     def close(self):
         self.game.close()
 
-env = StreetFighter()  
+#env = StreetFighter()  
 
 #game loop
 '''
@@ -118,7 +118,7 @@ def optimize_ppo(trial):
 
 #train and return mean reward
 def optimize_agent(trial):
-    #try:
+    try:
         model_params = optimize_ppo(trial)
 
         #create environment
@@ -129,7 +129,7 @@ def optimize_agent(trial):
 
         #create model
         model = PPO('CnnPolicy', env, tensorboard_log=LOG_DIR, verbose=0, **model_params)
-        model.learn(total_timesteps=30000)
+        model.learn(total_timesteps=100000)
 
         #evaluate model
         mean_reward, _ = evaluate_policy(model, env, n_eval_episodes=5)
@@ -140,10 +140,10 @@ def optimize_agent(trial):
 
         return mean_reward
 
-    #except Exception as e:
-    #    return -1000
+    except Exception as e:
+        return -1000
 
 study = optuna.create_study(direction='maximize')
-study.optimize(optimize_agent, n_trials=10, n_jobs=1)
+study.optimize(optimize_agent, n_trials=50, n_jobs=1)
 
 print(study.best_params)
