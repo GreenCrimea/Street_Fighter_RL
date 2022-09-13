@@ -1,4 +1,3 @@
-from tkinter.tix import ButtonBox
 import retro
 import time
 import numpy as np
@@ -6,23 +5,8 @@ from gym.spaces import MultiBinary, Box
 from gym import Env 
 import cv2
 
+
 #python -m retro.import .   <<<   IMPORT ROMS
-
-#open Street Fighter ROM
-#env = retro.make(game='StreetFighterIISpecialChampionEdition-Genesis')
-
-#game loop
-'''
-obs = env.reset()
-done = False
-for game in range(1):
-    while not done:
-        if done:
-            obs = env.reset()
-        env.render()
-        obs, reward, done, info = env.step(env.action_space.sample())
-        print(reward)
-'''
 
 #setup environment - preprocess game data
 class StreetFighter(Env):
@@ -49,7 +33,7 @@ class StreetFighter(Env):
         self.previous_frame = obs
 
         #fix reward val (score_delta + enemy_health_delta - health_delta)
-        reward = (info['score'] - self.score) + abs(info['enemy_health'] - self.enemy_health) - abs(info['health'] - self.health)
+        reward = ((info['score'] - self.score) / 20) + abs(info['enemy_health'] - self.enemy_health) - abs(info['health'] - self.health)
         self.score = info['score']
         self.enemy_health = info['enemy_health']
         self.health = info['health']
@@ -70,8 +54,10 @@ class StreetFighter(Env):
         #empty movement delta
         self.previous_frame = obs
 
-        #empty score delta
+        #empty score, health, enemy_health delta
         self.score = 0
+        self.enemy_health = 0
+        self.health = 0
 
         return obs
 
@@ -93,4 +79,22 @@ class StreetFighter(Env):
     def close(self):
         self.game.close()
 
-        
+env = StreetFighter()  
+
+#game loop
+'''
+obs = env.reset()
+done = False
+for game in range(1):
+    while not done:
+        if done:
+            obs = env.reset()
+        env.render()
+        obs, reward, done, info = env.step(env.action_space.sample())
+        #time.sleep(0.015)
+        if reward > 0:
+            print(reward)
+        if reward < 0:
+            print(reward)
+'''
+
