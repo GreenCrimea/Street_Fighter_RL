@@ -39,11 +39,27 @@ class StreetFighter(Env):
 
 
     def step(self, action):
-        pass
+        
+        #grab original ENV step
+        obs, reward, done, info = self.game.step(action)
+        obs = self.preprocess(obs)
+
+        #create frame delta
+        frame_delta = obs - self.previous_frame
+        self.previous_frame = obs
+
+        #fix reward val (score_delta + enemy_health_delta - health_delta)
+        reward = (info['score'] - self.score) + abs(info['enemy_health'] - self.enemy_health) - abs(info['health'] - self.health)
+        self.score = info['score']
+        self.enemy_health = info['enemy_health']
+        self.health = info['health']
+
+        return frame_delta, reward, done, info
+
 
 
     def render(self):
-        pass
+        self.game.render()
 
 
     def reset(self):
@@ -75,6 +91,6 @@ class StreetFighter(Env):
 
 
     def close(self):
-        pass
+        self.game.close()
 
         
