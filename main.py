@@ -9,6 +9,7 @@ from stable_baselines3 import PPO
 from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.vec_env import DummyVecEnv, VecFrameStack
+from stable_baselines3.common.callbacks import BaseCallback
 
 
 #python -m retro.import .   <<<   IMPORT ROMS
@@ -143,7 +144,60 @@ def optimize_agent(trial):
     except Exception as e:
         return -1000
 
-study = optuna.create_study(direction='maximize')
-study.optimize(optimize_agent, n_trials=50, n_jobs=1)
+#study = optuna.create_study(direction='maximize')
+#study.optimize(optimize_agent, n_trials=50, n_jobs=1)
 
-print(study.best_params)
+#print(study.best_params)
+
+best_params = { 'n_steps': 3145, 
+                'gamma': 0.8470926366932363, 
+                'learning_rate': 6.771090103601299e-05, 
+                'clip_range': 0.14992741298428075, 
+                'gae_lambda': 0.8530308639137029}
+#Model 19
+
+CHECKPOINT_DIR = './train/'
+
+#SAVE MODEL
+class TrainAndLoggingCallback(BaseCallback):
+
+    def __init__(self, check_freq, save_path, verbose=1):
+        super(TrainAndLoggingCallback, self).__init__(verbose)
+        self.check_freq = check_freq
+        self.save_path = save_path
+
+    def _init_callback(self):
+        if self.save_path is not None:
+            os.makedirs(self.save_path, exist_ok=True)
+
+    def _on_step(self):
+        if self.n_calls % self.check_freq == 0:
+            model_path = os.path.join(self.save_path, 'best_model_{}'.format(self.n_calls))
+            self.model.save(model_path)
+
+        return True
+
+callback = TrainAndLoggingCallback(check_freq=50000, save_path=CHECKPOINT_DIR)
+
+
+#TRAIN MODEL
+episodes = 50
+
+#create environment
+env = StreetFighter()
+env = Monitor(env, LOG_DIR)
+env = DummyVecEnv([lambda: env])
+env = VecFrameStack(env, 4, channels_order='last')
+
+#create model
+model = PPO('CnnPolicy', env, tensorboard_log=LOG_DIR, verbose=0, **best_params)
+
+#load weights
+model.load(os.path.join(OPT_DIR, 'trial_19_BEST'))
+
+for e in episodes:
+    model.learn(total_timesteps=100000, callback=callback)
+    mean_reward, _ = evaluate_policy(model, env, n_eval_episodes=25)
+    print('================')
+    print(f'EPISODE {e} DONE\n')
+    print(f'mean reward: {mean_reward}\n')
