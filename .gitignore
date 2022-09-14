@@ -2,3 +2,5 @@
 **/.venv
 **/.venv2
 **/logs
+**/opt
+**/train

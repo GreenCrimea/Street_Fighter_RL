@@ -149,7 +149,7 @@ def optimize_agent(trial):
 
 #print(study.best_params)
 
-best_params = { 'n_steps': 3145, 
+best_params = { 'n_steps': 3136, 
                 'gamma': 0.8470926366932363, 
                 'learning_rate': 6.771090103601299e-05, 
                 'clip_range': 0.14992741298428075, 
@@ -195,7 +195,7 @@ model = PPO('CnnPolicy', env, tensorboard_log=LOG_DIR, verbose=0, **best_params)
 #load weights
 model.load(os.path.join(OPT_DIR, 'trial_19_BEST'))
 
-for e in episodes:
+for e in range(episodes):
     model.learn(total_timesteps=100000, callback=callback)
     mean_reward, _ = evaluate_policy(model, env, n_eval_episodes=25)
     print('================')
