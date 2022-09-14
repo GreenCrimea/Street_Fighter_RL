@@ -151,7 +151,7 @@ def optimize_agent(trial):
 
 best_params = { 'n_steps': 3136, 
                 'gamma': 0.8470926366932363, 
-                'learning_rate': 6.771090103601299e-05, 
+                'learning_rate': 6.771090103601299e-07, 
                 'clip_range': 0.14992741298428075, 
                 'gae_lambda': 0.8530308639137029}
 #Model 19
@@ -181,7 +181,7 @@ callback = TrainAndLoggingCallback(check_freq=50000, save_path=CHECKPOINT_DIR)
 
 
 #TRAIN MODEL
-episodes = 50
+episodes = 10
 
 #create environment
 env = StreetFighter()
@@ -196,7 +196,7 @@ model = PPO('CnnPolicy', env, tensorboard_log=LOG_DIR, verbose=0, **best_params)
 model.load(os.path.join(OPT_DIR, 'trial_19_BEST'))
 
 for e in range(episodes):
-    model.learn(total_timesteps=100000, callback=callback)
+    model.learn(total_timesteps=500000, callback=callback)
     mean_reward, _ = evaluate_policy(model, env, n_eval_episodes=25)
     print('================')
     print(f'EPISODE {e} DONE\n')
