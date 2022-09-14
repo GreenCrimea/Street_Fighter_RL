@@ -112,7 +112,7 @@ def optimize_ppo(trial):
     return {    
         'n_steps': trial.suggest_int('n_steps', 2048, 8192),
         'gamma': trial.suggest_loguniform('gamma', 0.8, 0.9999),
-        'learning_rate': trial.suggest_loguniform('learning_rate', 1e-5, 1e-4),
+        'learning_rate': trial.suggest_loguniform('learning_rate', 1e-8, 1e-5),
         'clip_range': trial.suggest_uniform('clip_range', 0.1, 0.4),
         'gae_lambda': trial.suggest_uniform('gae_lambda', 0.8, 0.99)
     }
