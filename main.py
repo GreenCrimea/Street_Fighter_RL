@@ -133,7 +133,7 @@ def optimize_agent(trial):
         model.learn(total_timesteps=100000)
 
         #evaluate model
-        mean_reward, _ = evaluate_policy(model, env, n_eval_episodes=5)
+        mean_reward, _ = evaluate_policy(model, env, n_eval_episodes=25)
         env.close()
 
         SAVE_PATH = os.path.join(OPT_DIR, 'trial_{}_BEST'.format(trial.number))
@@ -144,17 +144,12 @@ def optimize_agent(trial):
     except Exception as e:
         return -1000
 
-#study = optuna.create_study(direction='maximize')
-#study.optimize(optimize_agent, n_trials=50, n_jobs=1)
+study = optuna.create_study(direction='maximize')
+study.optimize(optimize_agent, n_trials=100, n_jobs=1)
 
-#print(study.best_params)
-
-best_params = { 'n_steps': 3136, 
-                'gamma': 0.8470926366932363, 
-                'learning_rate': 6.771090103601299e-07, 
-                'clip_range': 0.14992741298428075, 
-                'gae_lambda': 0.8530308639137029}
-#Model 19
+print(study.best_params)
+'''
+best_params = 
 
 CHECKPOINT_DIR = './train/'
 
@@ -193,7 +188,7 @@ env = VecFrameStack(env, 4, channels_order='last')
 model = PPO('CnnPolicy', env, tensorboard_log=LOG_DIR, verbose=0, **best_params)
 
 #load weights
-model.load(os.path.join(OPT_DIR, 'trial_19_BEST'))
+model.load(os.path.join(OPT_DIR, 'trial__BEST'))
 
 for e in range(episodes):
     model.learn(total_timesteps=500000, callback=callback)
@@ -201,3 +196,4 @@ for e in range(episodes):
     print('================')
     print(f'EPISODE {e} DONE\n')
     print(f'mean reward: {mean_reward}\n')
+    '''
